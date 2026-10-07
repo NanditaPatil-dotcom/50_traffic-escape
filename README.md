@@ -7,7 +7,7 @@ Cross 8 lanes of oncoming traffic to reach the other side (Frogger-style).
 Submission is only the following three things:
 
 - [X] A 10-second video of gameplay **before** your changes, showing the bug/broken behavior : https://drive.google.com/file/d/1VH5TF25TXKRCH1wku4Hfqd_7mGBivjCq/view?usp=sharing
-- [X] A 10-second video of gameplay **after** your changes, showing the bug fixed and the new features working : https://drive.google.com/file/d/153evg-UdxD1HcpdpQKxlgUMPyBm-C9VQ/view?usp=sharing
+- [X] A 10-second video of gameplay **after** your changes, showing the bug fixed and the new features working : https://drive.google.com/file/d/1eUaok7crSIuPHGseTFqbGp3jREmVTun0/view?usp=sharing
 - [X] The Chat/LLM used page link, with the complete chat history : https://chatgpt.com/s/cx_6ac5c488c2b88191b076b299457f2aa4
 
 ## Setup
