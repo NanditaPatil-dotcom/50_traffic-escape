@@ -8,6 +8,7 @@ WIDTH=LANES*LANE_W
 HEIGHT=600
 FPS=60
 BG=(60,60,60)
+STARTING_LIVES=3
 
 class GameEngine:
     def __init__(self):
@@ -26,6 +27,8 @@ class GameEngine:
         self.spawn_interval=50
         self.speed=3
         self.score=0
+        self.lives=STARTING_LIVES
+        self.hit_cooldown=0
         self.game_over=False
         self.won=False
 
@@ -39,6 +42,8 @@ class GameEngine:
         if self.game_over or self.won: return
         keys=pygame.key.get_pressed()
         self.player.move(keys,0,WIDTH)
+        if self.hit_cooldown>0:
+            self.hit_cooldown-=1
         self.timer+=1
         if self.timer>=self.spawn_interval:
             lane=random.randint(0,LANES-1)
@@ -47,8 +52,9 @@ class GameEngine:
             self.spawn_interval=max(22,self.spawn_interval-0.2)
         for c in self.cars:
             c.update()
-            if c.rect.colliderect(self.player.rect):
-                self.game_over=True
+            if self.hit_cooldown==0 and c.rect.colliderect(self.player.rect):
+                self._handle_player_hit()
+                break
         self.cars=[c for c in self.cars if not c.off_screen(HEIGHT)]
         self.score+=1
         if self.score%300==0: self.speed=min(10,self.speed+0.5)
@@ -70,7 +76,7 @@ class GameEngine:
         self.player.draw(self.screen)
         hud=pygame.Rect(0,0,WIDTH,30)
         pygame.draw.rect(self.screen,(20,20,20),hud)
-        s=self.font.render(f"Score: {self.score//10}  GOAL: reach the top!  R=Restart",True,(220,220,220))
+        s=self.font.render(f"Lives: {self.lives}  Score: {self.score//10}  GOAL: reach the top!  R=Restart",True,(220,220,220))
         self.screen.blit(s,(6,4))
         if self.game_over:
             self._msg("CRASHED!",(220,60,60))
@@ -86,6 +92,15 @@ class GameEngine:
         sub=self.font.render("Press R to Restart",True,(200,200,200))
         self.screen.blit(m,(WIDTH//2-m.get_width()//2,HEIGHT//2-40))
         self.screen.blit(sub,(WIDTH//2-sub.get_width()//2,HEIGHT//2+20))
+
+    def _handle_player_hit(self):
+        self.lives-=1
+        if self.lives<=0:
+            self.game_over=True
+            return
+        self.player=Player(WIDTH//2,HEIGHT-80)
+        self.cars=[]
+        self.hit_cooldown=60
 
     def run(self):
         running=True

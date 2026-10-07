@@ -1,0 +1,47 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments and local package installs
+.venv/
+venv/
+env/
+ENV/
+pip-wheel-metadata/
+
+# Build and packaging output
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Game/runtime output
+high_scores.json
+scores.json
+save_data.json
+screenshots/
+recordings/
+*.mp4
+*.mov
+*.avi
+
+# IDE/editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
