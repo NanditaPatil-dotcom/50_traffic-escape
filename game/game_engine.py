@@ -11,6 +11,8 @@ HEIGHT=600
 FPS=60
 BG=(60,60,60)
 STARTING_LIVES=3
+DAY_NIGHT_SECONDS=5
+CYCLE_FRAMES=DAY_NIGHT_SECONDS*FPS
 RIVER_TOP=250
 RIVER_HEIGHT=90
 LOG_W=160
@@ -64,6 +66,8 @@ class GameEngine:
         self.lives=STARTING_LIVES
         self.hit_cooldown=0
         self.score_saved=False
+        self.cycle_timer=0
+        self.is_night=False
         self.game_over=False
         self.won=False
 
@@ -79,6 +83,10 @@ class GameEngine:
         self.player.move(keys,0,WIDTH)
         if self.hit_cooldown>0:
             self.hit_cooldown-=1
+        self.cycle_timer+=1
+        if self.cycle_timer>=CYCLE_FRAMES:
+            self.cycle_timer=0
+            self.is_night=not self.is_night
         self.timer+=1
         for log in self.logs:
             log.update()
@@ -103,25 +111,32 @@ class GameEngine:
             self._record_score()
 
     def draw(self):
-        self.screen.fill(BG)
+        road_color=(60,60,60) if not self.is_night else (20,24,34)
+        lane_color=(100,100,100) if not self.is_night else (70,78,95)
+        divider_color=(200,200,100) if not self.is_night else (180,170,90)
+        sidewalk_color=(150,130,110) if not self.is_night else (82,76,90)
+        water_color=(35,95,150) if not self.is_night else (12,42,76)
+        wave_color=(88,150,205) if not self.is_night else (48,92,135)
+        self.screen.fill(road_color)
         # road markings
         for i in range(LANES+1):
-            pygame.draw.line(self.screen,(100,100,100),(i*LANE_W,0),(i*LANE_W,HEIGHT),2)
+            pygame.draw.line(self.screen,lane_color,(i*LANE_W,0),(i*LANE_W,HEIGHT),2)
         for y in range(0,HEIGHT,60):
             for i in range(LANES):
-                pygame.draw.rect(self.screen,(200,200,100),pygame.Rect(i*LANE_W+LANE_W//2-3,y,6,30))
+                pygame.draw.rect(self.screen,divider_color,pygame.Rect(i*LANE_W+LANE_W//2-3,y,6,30))
         # sidewalks
-        pygame.draw.rect(self.screen,(150,130,110),pygame.Rect(0,HEIGHT-50,WIDTH,50))
-        pygame.draw.rect(self.screen,(150,130,110),pygame.Rect(0,0,WIDTH,30))
-        for c in self.cars: c.draw(self.screen)
-        pygame.draw.rect(self.screen,(35,95,150),RIVER_RECT)
+        pygame.draw.rect(self.screen,sidewalk_color,pygame.Rect(0,HEIGHT-50,WIDTH,50))
+        pygame.draw.rect(self.screen,sidewalk_color,pygame.Rect(0,0,WIDTH,30))
+        for c in self.cars: c.draw(self.screen,self.is_night)
+        pygame.draw.rect(self.screen,water_color,RIVER_RECT)
         for wave_y in range(RIVER_TOP+14,RIVER_TOP+RIVER_HEIGHT,24):
-            pygame.draw.line(self.screen,(88,150,205),(0,wave_y),(WIDTH,wave_y),2)
+            pygame.draw.line(self.screen,wave_color,(0,wave_y),(WIDTH,wave_y),2)
         for log in self.logs: log.draw(self.screen)
         self.player.draw(self.screen)
         hud=pygame.Rect(0,0,WIDTH,30)
         pygame.draw.rect(self.screen,(20,20,20),hud)
-        s=self.font.render(f"Lives: {self.lives}  Score: {self.score//10}  GOAL: reach the top!  R=Restart",True,(220,220,220))
+        mode="NIGHT" if self.is_night else "DAY"
+        s=self.font.render(f"{mode}  Lives: {self.lives}  Score: {self.score//10}  GOAL: reach the top!  R=Restart",True,(220,220,220))
         self.screen.blit(s,(6,4))
         if self.game_over:
             self._msg("CRASHED!",(220,60,60))
